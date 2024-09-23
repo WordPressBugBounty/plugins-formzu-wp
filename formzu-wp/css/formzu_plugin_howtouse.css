@@ -1,0 +1,77 @@
+.categorydiv > .inside {
+    padding: 6px 0 0 0;
+    /*margin: 0;admin-views-howtouseに直書きした*/
+}
+
+#formzu-help-tabs-wrap {
+    font-family: "Meiryo","MS PGothic", Arial, "ヒラギノ角ゴ Pro W3", sans-serif;
+    letter-spacing: 0.1em;
+    padding: 0;
+}
+
+#formzu-help-tabs-wrap > .help-tab-content {
+    margin: 0;
+}
+
+#formzu-help-tabs-wrap > .tabs-panel {
+    border-top: none;
+}
+
+#formzu-help-tabs-wrap .inside-left {
+    padding: 5px 12px 12px 0;
+}
+
+.inside-left p {
+    font-weight: bold;
+}
+
+.categorydiv div.tabs-panel {
+    min-height: 240px;
+    max-height: 600px;
+}
+
+#contextual-help-back {
+    background-color: #fdfdfd;
+    border-right: none;
+    right: 0px;
+}
+
+.contextual-help-tabs > .contextual-help-sidebar {
+    float: none;
+}
+
+.contextual-help-sidebar {
+}
+
+.formzu-help-link {
+    color: #0073aa;
+    cursor: pointer;
+    padding: 5px 5px 5px 12px;
+}
+
+.formzu-help-link:hover {
+    color: #32373c;
+}
+
+.contextual-help-tabs .active {
+    background-color: #fdfdfd;
+}
+
+.contextual-help-tabs .active a{
+}
+
+table {
+    margin-bottom: 40px;
+    border-collapse: collapse;
+    border: solid #e0e0dc;
+    border-width: 1px 0 0 1px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
+}
+
+th, td {
+    border: solid #e0e0dc;
+    border-width: 0 1px 1px 0;
+    padding: 8px 12px;
+    text-align: left;
+}
+
