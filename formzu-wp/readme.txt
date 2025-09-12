@@ -1,11 +1,11 @@
 === Formzu WP ===
 Contributors: skagaya, ogasawat
-Donate link: 
+Donate link:
 Tags: フォーム, メールフォーム, formzu, form, contact form, フォームズ
 Requires at least: 3.7
-Tested up to: 6.4.3
+Tested up to: 6.8.2
 Requires PHP: 5.2
-Stable tag: 1.6.10
+Stable tag: 1.6.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,6 +58,9 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 
 == Changelog ==
+
+= v1.6.11 =
+* WordPress6.8へ対応
 
 = v1.6.10 =
 * アクションフックにおける不具合に対する修正

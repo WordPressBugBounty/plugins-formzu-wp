@@ -3,7 +3,7 @@
  * Plugin Name:       Formzu WP
  * Plugin URI:        https://wordpress.org/plugins/formzu-wp/
  * Description:       Formzu WP
- * Version:           1.6.10
+ * Version:           1.6.11
  * Requires at least: 3.7
  * Requires PHP:      5.2
  * Author:            formzu Inc.
