@@ -1,8 +1,8 @@
 <?php
-
 if ( ! defined('FORMZU_PLUGIN_PATH') ) {
     die();
 }
+
 
 function formzu_navmenu_enqueue_script() {
     wp_enqueue_script(
@@ -26,4 +26,3 @@ function formzu_navmenu_enqueue_script() {
         )
     );
 }
-

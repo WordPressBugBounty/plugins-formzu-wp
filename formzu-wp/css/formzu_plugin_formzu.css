@@ -38,8 +38,8 @@
 }
 
 /*
- * Fixed at 2020.10.21
- *   - WordPress5.5への対応(metaboxの仕様変更に伴うもの)
+ * Fixed on 2020.10.21
+ * - WordPress5.5への対応(metaboxの仕様変更に伴うもの)
  */
 #formzu-create-box > div.postbox-header,
 #formzu-add-box > div.postbox-header,
@@ -216,15 +216,10 @@ div.separate-box {
     padding: 13px 12px 11px;
 }
 
-
 #goto-formzu-page-button {
     margin: 0 0 20px 0;
 }
-#open-formzu-page-button {
-    font-size: 14px;
-    padding: 4px 12px;
-    display: block;
-}
+
 .large-button {
     background-color: #aaa;
     color: #fff;
@@ -257,4 +252,3 @@ i {
 .wp-list-table .column-widgetbutton { width: 14%; }
 .wp-list-table .column-shortcode { width: 15%; }
 .wp-list-table .column-items { width: 25%; }
-

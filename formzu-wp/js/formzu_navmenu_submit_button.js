@@ -2,9 +2,9 @@
     undefined;
     $(function(){
 
-        function bePressableButton(eneble) {
-            var visible = eneble ? 'hidden' : 'visible'; 
-            var disable = eneble ? false : true;
+        function bePressableButton(enable) {
+            var visible = enable ? 'hidden' : 'visible';
+            var disable = enable ? false : true;
 
             $('#' + formzu_ajax_obj.metabox_id).find('.spinner').css('visibility', visible);
             $('#' + formzu_ajax_obj.submit_id).prop('disabled', disable);
@@ -17,7 +17,7 @@
 
             var form_id = $('#' + formzu_ajax_obj.select_id).val();
 
-            if (!form_id) {
+            if ( ! form_id ) {
                 alert("フォームID : " + form_id + "\n無効な値が入力されました。正確な値を入力してください。");
                 bePressableButton(true);
                 return false;
@@ -48,4 +48,3 @@
         $('#' + formzu_ajax_obj.submit_id).bind('click', submitNavFormSelect);
     });
 })(jQuery);
-

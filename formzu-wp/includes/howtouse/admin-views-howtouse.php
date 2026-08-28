@@ -1,13 +1,14 @@
 <?php
-
 if ( ! defined('FORMZU_PLUGIN_PATH') ) {
     die();
 }
 
-/*
- * Fixed at 2020.10.21
- *   - 「設定」項目を廃止
- */
+
+// Fixed on 2020.10.21
+// - 「設定」項目を廃止
+// Fixed on 2026.08.20
+// - 「改善要望」「不具合報告」リンククリック時に
+//   余分なポップアップが表示されないよう修正
 function echo_how_to_use_formzu() {
 ?>
     <div class="wrap">
@@ -18,62 +19,85 @@ function echo_how_to_use_formzu() {
                 <div class="meta-box-sortables">
 
                     <div class="postbox categorydiv">
-                        <h3 class="hndle"><span><?php _e( '使い方', 'formzu-admin' ); ?></span></h3>
+                        <h3 class="hndle">
+                            <span><?php _e('使い方', 'formzu-admin'); ?></span>
+                        </h3>
                         <div class="inside" style="margin: 0;">
                             <div id="contextual-help-back"></div>
                             <div id="contextual-help-columns">
-
 
                                 <div class="contextual-help-tabs">
 
                                     <ul style="min-height: 230px;">
                                         <li class="tabs active">
-                                            <a href="#help-tab1" area-controls="help-tab1">フォーム作成の詳しい説明</a>
+                                            <a href="#help-tab1" aria-controls="help-tab1">フォーム作成の詳しい説明</a>
                                         </li>
                                         <li class="tabs">
-                                            <a href="#help-tab2" area-controls="help-tab2">固定ページ</a>
+                                            <a href="#help-tab2" aria-controls="help-tab2">固定ページ</a>
                                         </li>
                                         <li class="tabs">
-                                            <a href="#help-tab3" area-controls="help-tab3">メニュー</a>
+                                            <a href="#help-tab3" aria-controls="help-tab3">メニュー</a>
                                         </li>
                                         <li class="tabs">
-                                            <a href="#help-tab4" area-controls="help-tab4">ウィジェット</a>
+                                            <a href="#help-tab4" aria-controls="help-tab4">ウィジェット</a>
                                         </li>
                                         <li class="tabs">
-                                            <a href="#help-tab5" area-controls="help-tab5">ショートコード</a>
+                                            <a href="#help-tab5" aria-controls="help-tab5">ショートコード</a>
                                         </li>
                                         <li class="tabs">
-                                            <a href="#help-tab6" area-controls="help-tab6">テンプレート</a>
+                                            <a href="#help-tab6" aria-controls="help-tab6">テンプレート</a>
                                         </li>
-                                        <!--
                                         <li class="tabs">
-                                            <a href="#help-tab7" area-controls="help-tab7">設定</a>
-                                        </li>
-                                        -->
-                                        <li class="tabs">
-                                            <a href="#help-tab8" area-controls="help-tab8">エラー・トラブル</a>
+                                            <a href="#help-tab8" aria-controls="help-tab8">エラー・トラブル</a>
                                         </li>
                                     </ul>
 
                                     <div class="contextual-help-sidebar">
                                         <p><strong>フォームズのページ</strong></p>
-                                        <div class="formzu-help-link" href="https://www.formzu.com/" target="_blank">トップページ</div>
-                                        <div class="formzu-help-link" href="https://www.formzu.com/faq" target="_blank">よくある質問</div>
-                                        <div class="formzu-help-link" href="https://www.formzu.com/setup_form" target="_blank">設置方法</div>
-                                        <div class="formzu-help-link" href="https://www.formzu.com/news" target="_blank">新着情報</div>
-                                        <div class="formzu-help-link" onClick="javascript:window.open('https://ws.formzu.net/dist/S95904411/', 'mailform1', 'toolbar=no, location=no, status=yes, menubar=yes, resizable=yes, scrollber=yes, width=600, height=550, top=50, left=50')">改善要望</div>
-                                        <div class="formzu-help-link" onClick="javascript:window.open('https://ws.formzu.net/dist/S97257136/', 'mailform1', 'toolbar=no, location=no, status=yes, menubar=yes, resizable=yes, scrollber=yes, width=600, height=550, top=50, left=50')">不具合報告</div>
+                                        <a class="formzu-help-link" href="https://www.formzu.com/" target="_blank" rel="noopener noreferrer">トップページ</a>
+                                        <a class="formzu-help-link" href="https://www.formzu.com/faq" target="_blank" rel="noopener noreferrer">よくある質問</a>
+                                        <a class="formzu-help-link" href="https://www.formzu.com/setup_form" target="_blank" rel="noopener noreferrer">設置方法</a>
+                                        <a class="formzu-help-link" href="https://www.formzu.com/news" target="_blank" rel="noopener noreferrer">新着情報</a>
+                                        <div class="formzu-help-link" onClick="return open_formzu_popup('https://ws.formzu.net/dist/S95904411/');">改善要望</div>
+                                        <div class="formzu-help-link" onClick="return open_formzu_popup('https://ws.formzu.net/dist/S97257136/');">不具合報告</div>
                                         <script>
                                             (function($){
-                                                $('.formzu-help-link').bind('click', function(){
+                                                // ヘルプタブを左側サイドバーに維持しつつリンクを開けるようにする仕組み(旧コード)
+                                                /*
+                                                $('div.formzu-help-link').bind('click', function(){
+                                                    if ( $(this).attr('href') === undefined ) {
+                                                        return;
+                                                    }
                                                     window.open($(this).attr('href'));
                                                 });
+                                                */
+
+                                                // Added on 2026.08.21
+                                                // - 左サイドバー内ヘルプタブのaリンクが動作するようにする(WordPressの干渉を防止)
+                                                $('a.formzu-help-link').on('click', function(e){
+                                                    e.stopPropagation();
+                                                });
                                             })(jQuery);
+
+                                            // Added on 2026.08.21
+                                            // - 2つ以上ブラウザウィンドウを開いている際に強制的に最初のウィンドウ側に
+                                            //   小窓が表示されるのを防止
+                                            function open_formzu_popup(url) {
+                                                var popup_features = 'toolbar=no,location=no,status=yes,menubar=yes,resizable=yes,scrollbars=yes,width=600,height=550,top=50,left=50';
+                                                var popup = window.open('', '_blank', popup_features);
+
+                                                if ( ! popup ) {
+                                                    return false;
+                                                }
+
+                                                popup.opener = null;
+                                                popup.location.replace(url);
+
+                                                return false;
+                                            }
                                         </script>
                                     </div>
-
                                 </div>
-
 
                                 <div id="formzu-help-tabs-wrap" class="contextual-help-tabs-wrap">
                                     <div id="help-tab1" class="metabox-holder tabs-panel help-tab-content" style="display: block;">
@@ -119,15 +143,6 @@ function echo_how_to_use_formzu() {
                                         <?php echo_how_to_use_formzu_template(); ?>
                                     </div>
 
-                                    <!--
-                                    <div id="help-tab7" class="metabox-holder tabs-panel help-tab-content">
-                                        <div class="inside inside-left">
-                                            <h1>設定</h1>
-                                        </div>
-                                        <?php //echo_about_formzu_option(); ?>
-                                    </div>
-                                    -->
-
                                     <div id="help-tab8" class="metabox-holder tabs-panel help-tab-content">
                                         <div class="inside inside-left">
                                             <h1>エラー・トラブル</h1>
@@ -136,7 +151,6 @@ function echo_how_to_use_formzu() {
                                     </div>
 
                                 </div>
-
 
                             </div>
                         </div>
@@ -196,8 +210,7 @@ function echo_how_to_create_formzu_form() {
             <p>フォーム保存完了画面へ移動した後、<strong>「フォーム作成通知メール」</strong>が送信されます。</p>
             <p>フォーム作成準備で確認したメールアドレス宛てに<strong>「フォーム作成通知メール」</strong>が届いているかを確認してください。</p>
             <p>
-                フォーム作成通知メールが届かない場合は、メールアドレスが間違っている可能性があります。
-                <br>
+                フォーム作成通知メールが届かない場合は、メールアドレスが間違っている可能性があります。<br>
                 フォームズのフォーム作成画面の左側メニュー内のフォーム基本情報からメールアドレスを再度確認してください。
             </p>
         </div>
@@ -336,10 +349,9 @@ function echo_how_to_create_formzu_menu() {
 <?php
 }
 
-/*
- * Fixed at 2020.10.21
- *   - 設定項目を移動
- */
+
+// Fixed on 2020.10.21
+// - 設定項目を移動
 function echo_how_to_create_formzu_widget() {
 ?>
     <div class="inside inside-left">
@@ -405,10 +417,9 @@ function echo_how_to_create_formzu_widget() {
 <?php
 }
 
-/*
- * Fixed at 2020.10.21
- *   - 設定項目を移動
- */
+
+// Fixed on 2020.10.21
+// - 設定項目を移動
 function echo_how_to_create_formzu_shortcode() {
 ?>
     <div class="inside inside-left">
@@ -518,124 +529,10 @@ function echo_how_to_use_formzu_template() {
 <?php
 }
 
-/*
- * Fixed at 2020.10.21
- *   - 「設定」項目の内容を「ウィジェット」「ショートコード」項目へ移動
- *   - 「設定」項目の廃止
- */
-//function echo_about_formzu_option() {
-?>
-    <!--
-    <div class="inside">
-        <h2>ショートコード設定（[formzu 名前="値" ]）</h2>
-    </div>
-    <table>
-        <tbody>
-            <tr>
-                <th scope="col">名前</th>
-                <th scope="col">意味</th>
-                <th scope="col">初期値</th>
-            </tr>
-            <tr>
-                <td>form_id</td>
-                <td>フォームIDです。S + 5～9桁の数字です。必須。</td>
-                <td>""</td>
-            </tr>
-            <tr>
-                <td>width</td>
-                <td>表示するフォームの幅です。</td>
-                <td>"600"</td>
-            </tr>
-            <tr>
-                <td>height</td>
-                <td>表示するフォームの高さです。自動で設定させたい場合は消去してください。</td>
-                <td>自動取得値 or "800"</td>
-            </tr>
-            <tr>
-                <td>mobile_height</td>
-                <td>モバイル（スマホ、タブレット等）で表示するフォームの高さです。自動で設定させたい場合は消去してください。</td>
-                <td>自動取得値 or "900"</td>
-            </tr>
-            <tr>
-                <td>tagname</td>
-                <td>表示に使うHTML要素です。"iframe" or "a"</td>
-                <td>"iframe"</td>
-            </tr>
-            <tr>
-                <td>text</td>
-                <td>リンク文字列として表示されるテキストです。<br>フォームをiframeで埋め込む際には必要ありません。</td>
-                <td>""</td>
-            </tr>
-            <tr>
-                <td>thickbox</td>
-                <td>モーダル画面で表示させるかどうかの設定です。"on" or "off"</td>
-                <td>"off"</td>
-            </tr>
-            <tr>
-                <td>new_window</td>
-                <td>別ウィンドウで表示させるかどうかの設定です。"on" or "off"</td>
-                <td>"off"</td>
-            </tr>
-            <tr>
-                <td>id</td>
-                <td>HTML要素のid属性を設定します。</td>
-                <td>""</td>
-            </tr>
-            <tr>
-                <td>class</td>
-                <td>HTML要素のclass属性を設定します。</td>
-                <td>""</td>
-            </tr>
-        </tbody>
-    </table>
 
-    <div class="inside">
-        <h2>ウィジェット設定</h2>
-    </div>
-    <table>
-        <tbody>
-            <tr>
-                <th>名前</th>
-                <th>意味</th>
-                <th>初期値</th>
-            </tr>
-            <tr>
-                <td>リンクさせるフォーム</td>
-                <td>ウィジェットとリンクさせるフォームです。<br>フォームIDで登録したフォームだけが表示されます。</td>
-                <td>最後に登録したフォーム</td>
-            </tr>
-            <tr>
-                <td>表示するタイトル</td>
-                <td>フォームの位置を示す文字列です。<br>設定しなければ何も表示されません。</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>表示するリンク文字列</td>
-                <td>フォームを開くためにクリックする文字列です。<br>設定しなければ何も表示されません。</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>表示する位置</td>
-                <td>ウィジェットをどこに表示させるかの画面位置です。<br>'左下'と'右下'はスクロールに追従します。</td>
-                <td>通常</td>
-            </tr>
-            <tr>
-                <td>画面を開く方式</td>
-                <td>リンクをクリックした際のフォーム画面の開き方です。</td>
-                <td>モーダル画面</td>
-            </tr>
-            <tr>
-                <td>タイトルをリンクとして使う</td>
-                <td>タイトル部分をリンク文字列として使用します。<br>タイトルをクリックしてフォームを開きます。</td>
-                <td>×</td>
-            </tr>
-        </tbody>
-    </table>
-    -->
-<?php
-//}
-
-
+// Fixed on 2020.10.21
+// - 「設定」項目の内容を「ウィジェット」「ショートコード」項目へ移動
+// - 「設定」項目の廃止
 function echo_about_formzu_error() {
 ?>
     <div class="inside inside-left">
@@ -667,7 +564,7 @@ function echo_about_formzu_error() {
                 <li><span>PHPの設定 : 設定ファイル（php.ini）のallow_url_fopenがoffになっている可能性があります。レンタルサーバーなどでセキュリティ対策としてoffになっている場合があります。</span></li>
                 <li><span>他のプラグインからの影響：他のプラグインのPHP出力処理と当プラグインのPHP出力処理とが競合し、正常な出力結果が得られない状態である可能性があります。</span></li>
             </ul>
-            <a href="https://www.formzu.com/setup_form" target="_blank">プラグイン以外にフォーム設置する方法</a>
+            <a href="https://www.formzu.com/setup_form" target="_blank" rel="noopener noreferrer">プラグイン以外にフォーム設置する方法</a>
         </div>
     </div>
 
@@ -681,7 +578,7 @@ function echo_about_formzu_error() {
             <p>「height」はパソコンから見た場合のフォームの高さを調節できます。（例 height="800"</p>
             <p>「mobile_height」はスマホ・携帯から見た場合のフォームの高さを調節できます。（例 mobile_height="900"</p>
             <p>スクロールバーを消したい場合は、値を増やしてスペースを広げることで解決できます。</p>
-            <p>上手くいかない場合は<a href="https://www.formzu.com/setup_form" target="_blank">フォームの設置方法</a>の「ぺージ内に埋め込む方法」もお試しください。</p>
+            <p>上手くいかない場合は<a href="https://www.formzu.com/setup_form" target="_blank" rel="noopener noreferrer">フォームの設置方法</a>の「ぺージ内に埋め込む方法」もお試しください。</p>
         </div>
     </div>
 
@@ -696,4 +593,3 @@ function echo_about_formzu_error() {
     </div>
 <?php
 }
-

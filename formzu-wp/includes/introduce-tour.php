@@ -1,5 +1,4 @@
 <?php
-
 if ( ! defined('FORMZU_PLUGIN_PATH') ) {
     die();
 }
@@ -8,6 +7,7 @@ class Formzu_Plugin_Tour
 {
     const POINTER_CLOSE_ID = 'formzu_close_tour';
     private static $instance;
+
 
     public static function get_instance()
     {
@@ -23,11 +23,6 @@ class Formzu_Plugin_Tour
 
     private function __construct()
     {
-        global $wp_version;
-
-        if ( version_compare($wp_version, '3.4', '<') )
-            return false;
-
         if ( self::tour_is_closing_now() ) {
             $dismissed_pointers = self::get_closed_data_array();
             $dismissed_pointers[] = 'formzu_close_tour';
@@ -50,8 +45,8 @@ class Formzu_Plugin_Tour
 
     public static function is_closed_tour()
     {
-        $dismissed_pointers = self::get_closed_data_array(); 
-        if ( in_array(self::POINTER_CLOSE_ID, $dismissed_pointers) ) {
+        $dismissed_pointers = self::get_closed_data_array();
+        if ( in_array(self::POINTER_CLOSE_ID, $dismissed_pointers, true) ) {
             return true;
         }
         return false;
@@ -60,8 +55,8 @@ class Formzu_Plugin_Tour
 
     public static function reset_closing_tour()
     {
-        $dismissed_pointers = self::get_closed_data_array(); 
-        $index_of_closed = array_search(self::POINTER_CLOSE_ID, $dismissed_pointers);
+        $dismissed_pointers = self::get_closed_data_array();
+        $index_of_closed = array_search(self::POINTER_CLOSE_ID, $dismissed_pointers, true);
         if ( $index_of_closed !== false ) {
             array_splice($dismissed_pointers, $index_of_closed, 1);
             self::set_closed_data_array($dismissed_pointers);
@@ -69,13 +64,19 @@ class Formzu_Plugin_Tour
     }
 
 
+    // Fixed on 2026.08.26
+    // - get_user_metaの戻り値が文字列でない場合に空配列を返すよう修正
     public static function get_closed_data_array()
     {
-        $dismissed_pointers = explode(',', get_user_meta(get_current_user_id(), 'dismissed_wp_pointers', true));
-        return $dismissed_pointers;
+        $dismissed_pointers = get_user_meta(get_current_user_id(), 'dismissed_wp_pointers', true);
+        if ( ! is_string($dismissed_pointers) ) {
+            return array();
+        }
+
+        return explode(',', $dismissed_pointers);
     }
 
-    
+
     public static function set_closed_data_array($dismissed_pointers)
     {
         update_user_meta(get_current_user_id(), 'dismissed_wp_pointers', implode(',', $dismissed_pointers));
@@ -84,13 +85,13 @@ class Formzu_Plugin_Tour
 
     public function queue_tour()
     {
-        if ( !current_user_can('manage_options') ) {
-            return; 
+        if ( ! current_user_can('manage_options') ) {
+            return;
         }
 
-        $dismissed_pointers = self::get_closed_data_array(); 
+        $dismissed_pointers = self::get_closed_data_array();
 
-        if ( in_array(self::POINTER_CLOSE_ID, $dismissed_pointers) ) {
+        if ( in_array(self::POINTER_CLOSE_ID, $dismissed_pointers, true) ) {
         }
         else {
             wp_enqueue_style('wp-pointer');
@@ -192,13 +193,13 @@ class Formzu_Plugin_Tour
         if ( isset($_GET['page']) ) {
             $page = $_GET['page'];
         }
-        if ( empty($page) && isset($screen->id)) {
+        if ( empty($page) && isset($screen->id) ) {
             $page = $screen->id;
         }
         //条件：現在開いているページがプラグイン一覧だったら
         //if( strpos(admin_url('plugins.php'), explode('?', add_query_arg(array()))[0] ) !== false ) {
         $url_and_param = explode('?', add_query_arg(array()));
-        if( strpos(admin_url('plugins.php'), $url_and_param[0] ) !== false ) {
+        if ( strpos(admin_url('plugins.php'), $url_and_param[0] ) !== false ) {
             $page = 'plugin_page';
         }
         //同じページで複数の案内を表示させるためのカウンター
@@ -209,7 +210,16 @@ class Formzu_Plugin_Tour
             $index = 0;
         }
 
-        $page_item = $adminpages[$page][$index];
+        // Fixed on 2026/08/18
+        // - ツアーページに存在しないインデックスを指定した場合に
+        //   undefind array keyエラーが発生するのを防止
+        $page_item = array();
+        if ( ! isset($adminpages[$page][$index]) ) {
+            $page_item = $adminpages[$page][count($adminpages[$page]) - 1];
+        } else {
+            $page_item = $adminpages[$page][$index];
+        }
+
         $button2 = '';
         $button3 = '';
         $function2 = '';
@@ -222,23 +232,23 @@ class Formzu_Plugin_Tour
         else {
             $id = '#' . $screen->id;
         }
-        if ( $page != '' && in_array($page, array_keys($adminpages)) ) {
+        if ( $page !== '' && in_array($page, array_keys($adminpages), true) ) {
 
-            $align = (is_rtl()) ? 'right' : 'left';
+            $align = ( is_rtl() ) ? 'right' : 'left';
             $opt_arr = array(
                 'content'  => $page_item['content'],
                 'position' => array(
-                    'edge'  => (!empty($page_item['position']['edge'])) ? $page_item['position']['edge'] : 'left',
-                    'align' => (!empty($page_item['position']['align'])) ? $page_item['position']['align'] : $align,
+                    'edge'  => ( ! empty($page_item['position']['edge']) )  ? $page_item['position']['edge']  : 'left',
+                    'align' => ( ! empty($page_item['position']['align']) ) ? $page_item['position']['align'] : $align,
                 ),
                 'pointerWidth' => 400,
             );
 
             if ( isset($page_item['button2']) ) {
-                $button2 = (!empty($page_item['button2'])) ? $page_item['button2'] : __('次へ', 'formzu-admin');
+                $button2 = ( ! empty($page_item['button2']) ) ? $page_item['button2'] : __('次へ', 'formzu-admin');
             }
             if ( isset($page_item['button3']) ) {
-                $button3 = (!empty($page_item['button3'])) ? $page_item['button3'] : __('前へ', 'formzu-admin');
+                $button3 = ( ! empty($page_item['button3']) ) ? $page_item['button3'] : __('前へ', 'formzu-admin');
             }
             if ( isset($page_item['function2']) ) {
                 $function2 = $page_item['function2'];
@@ -260,7 +270,7 @@ class Formzu_Plugin_Tour
 
                 formzu_pointer_options = $.extend(formzu_pointer_options, {
                     buttons: function(event, t){
-                        button = $('<a id="pointer-close" style="margin-left: 5px" class="button-secondary">' + '<?php echo __('これ以降の説明を表示しない', 'formzu-admin'); ?>' + '</a>');
+                        var button = $('<a id="pointer-close" style="margin-left: 5px" class="button-secondary">' + '<?php echo __('これ以降の説明を表示しない', 'formzu-admin'); ?>' + '</a>');
                         button.bind('click.pointer', function(){
                             t.element.pointer('close');
                         });
@@ -295,9 +305,10 @@ class Formzu_Plugin_Tour
                     });
                 };
 
-                if(formzu_pointer_options.position && formzu_pointer_options.position.defer_loading){
+                if ( formzu_pointer_options.position && formzu_pointer_options.position.defer_loading ) {
                     $(window).bind('load.wp-pointers', setup);
-                }else{
+                }
+                else {
                     $(document).ready(setup);
                 }
             })(jQuery);
@@ -306,4 +317,3 @@ class Formzu_Plugin_Tour
 <?php
     }
 }
-

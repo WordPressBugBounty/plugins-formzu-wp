@@ -1,8 +1,8 @@
 <?php
-
 if ( ! defined('FORMZU_PLUGIN_PATH') ) {
     die();
 }
+
 
 function add_howtouse_formzu_stylesheet() {
 ?>
@@ -86,4 +86,3 @@ function add_howtouse_formzu_stylesheet() {
     </style>
 <?php
 }
-

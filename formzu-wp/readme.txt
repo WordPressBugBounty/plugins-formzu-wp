@@ -3,9 +3,9 @@ Contributors: skagaya, ogasawat
 Donate link:
 Tags: フォーム, メールフォーム, formzu, form, contact form, フォームズ
 Requires at least: 3.7
-Tested up to: 6.8.2
-Requires PHP: 5.2
-Stable tag: 1.6.11
+Tested up to: 7.1
+Requires PHP: 5.6
+Stable tag: 1.7.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -58,6 +58,19 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 
 == Changelog ==
+
+= v1.7.0 =
+* WordPress7.1へ対応
+* PHP8.5へ対応
+* PHPの最低動作バージョンを5.6に引き上げ
+* フォーム一覧画面の一括操作におけるCSRF脆弱性に対する修正
+* フォーム一覧画面,ウィジェット作成におけるXSS脆弱性に対する修正
+* フォームの更新方法を修正
+* フォーム一括操作の「入れ替え」における不具合を修正
+* ウィジェットの「リンクさせるフォーム」における不具合を修正
+* ウィジェットの削除における不具合を修正
+* フォーム一括操作の「削除」で削除したフォームのウィジェットが自動削除される機能を追加
+* その他機能改善、セキュリティ向上のための修正
 
 = v1.6.11 =
 * WordPress6.8へ対応

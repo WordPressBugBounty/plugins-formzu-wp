@@ -1,4 +1,6 @@
 <?php
+// Fixed on 2026.08.17
+// - true,falseの表記を小文字に統一
 
 if ( ! defined('FORMZU_PLUGIN_PATH') ) {
     die();
@@ -13,7 +15,7 @@ class FormzuParamHelper
 
     public static function have_value( $arg )
     {
-        if (isset($arg)) {
+        if ( isset($arg) ) {
             return true;
         }
         return false;
@@ -28,15 +30,15 @@ class FormzuParamHelper
         if ( ! is_array($data) ) {
             return false;
         }
-        if (is_array($name)) {
-            $not_exist = FALSE;
+        if ( is_array($name) ) {
+            $not_exist = false;
             for ($i = 0, $l = count($name); $i < $l; $i++) {
                 if ( ! array_key_exists($name[$i], $data) || ! isset($data[$name[$i]]) ) {
-                    $not_exist = TRUE;
+                    $not_exist = true;
                     break;
                 }
             }
-            if ($not_exist) {
+            if ( $not_exist ) {
                 return false;
             }
         }
@@ -51,7 +53,7 @@ class FormzuParamHelper
 
     public static function get_value_of_key( $data, $name )
     {
-        if (self::isset_key($data, $name)) {
+        if ( self::isset_key($data, $name) ) {
             return $data[$name];
         }
         return null;
@@ -89,7 +91,7 @@ class FormzuParamHelper
 
     public static function is_equal( $data, $value )
     {
-        if ($data !== $value) {
+        if ( $data !== $value ) {
             return false;
         }
         return true;
@@ -100,22 +102,22 @@ class FormzuParamHelper
     {
         global $pagenow;
 
-        if ($pagenow && $pagenow != 'admin.php') {
-            return false; 
-        }
-
-        /*
-         * Fixed on 2024.02.26 by skagaya
-         * - "Warning: Undefined array key"に対する修正
-         *   (一部テーマのCSSキャッシュ削除時にこのエラーが発生)
-         */
-        if ( isset($_GET['page']) == false ) {
+        if ( $pagenow && $pagenow !== 'admin.php' ) {
             return false;
         }
 
-        $page_val = sanitize_title($_GET['page']);
+        // Fixed on 2024.02.26
+        // - "Warning: Undefined array key"に対する修正
+        //   (一部テーマのCSSキャッシュ削除時にこのエラーが発生)
+        // Fixed on 2026.08.18
+        // - sanitize_title内のpreg_matchで発生するTypeErrorを防止
+        if ( ! isset($_GET['page']) || ! is_string($_GET['page']) ) {
+            return false;
+        }
 
-        if ($page_val !== $page) {
+        $page_val = sanitize_title(wp_unslash($_GET['page']));
+
+        if ( $page_val !== $page ) {
             return false;
         }
         if ( ! is_admin() ) {
@@ -124,64 +126,74 @@ class FormzuParamHelper
         return true;
     }
 
+
     public static function is_true( $value )
     {
-        if ( $value === true 
-            || $value == 1
-            || $value == 'true') {
+        if ( $value === true
+            || $value === 'true'
+            || $value === 'TRUE'
+            || $value === 1
+            || $value === '1'
+        ) {
             return true;
         }
         return false;
     }
 
+
     public static function has_values( $args )
     {
-        //if ( ! is_array($args) ) {
-            //singleVar or Object
-        //}
-
-        $dont_has = FALSE;
+        $dont_has = false;
 
         foreach ($args as $arg) {
             if ( ! self::have_value($arg) ) {
-                $dont_has = TRUE;
+                $dont_has = true;
                 break;
             }
         }
-        if ($dont_has) {
+        if ( $dont_has ) {
             return false;
         }
         return true;
     }
 
+
+    // Fixed on 2026.08.18
+    // - wp_verify_nonceにおけるWarning(Array to string conversion)を防止
     public static function check_referer( $nonce_action, $nonce_key )
     {
         if ( ! self::isset_key($_REQUEST, $nonce_key) ) {
             return false;
         }
 
-        //$nonce = filter_input(INPUT_GET, $nonce_key, FILTER_SANITIZE_STRING);
-        //$nonce = filter_input(INPUT_POST, $nonce_key, FILTER_SANITIZE_STRING);
-
-        if ( ! wp_verify_nonce($_REQUEST[$nonce_key], $nonce_action)) {
+        if ( ! is_string($_REQUEST[$nonce_key]) ) {
             return false;
         }
+
+        $nonce = sanitize_text_field(wp_unslash($_REQUEST[$nonce_key]));
+        if ( ! wp_verify_nonce($nonce, $nonce_action) ) {
+            return false;
+        }
+
         return true;
     }
 
+
+    // Fixed on 2026.08.17
+    // - フォームIDが文字列以外の場合にpreg_matchで発生するTypeErrorを防止
+    // - フォームIDを部分一致から完全一致で検証するように変更
+    // Fixed on 2026.08.18
+    // - フォームIDの桁数を5～9桁に修正
     public static function validate_form_id( $form_id )
     {
-        if ( ! $form_id ) {
+        if ( ! is_string($form_id) ) {
             return false;
         }
 
-        preg_match("/^S[0-9]{3,9}/", $form_id, $matches);
-
-        if ( ! $matches) {
+        if ( preg_match("/^S[0-9]{5,9}$/D", $form_id) !== 1 ) {
             return false;
         }
-        return $matches[0];
+
+        return $form_id;
     }
-
 }
-

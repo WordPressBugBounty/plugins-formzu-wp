@@ -1,11 +1,4 @@
 (function($) {
-    /*
-     * Fixed at 2020.10.26
-     *   - 用途不明のundefinedをコメントアウト   
-     */
-    //undefined;
-
-    //if (!$.parseHTML || typeof $.parseHTML !== 'function') 
     function parseHTML(string) {
         var tmp_html = document.implementation.createHTMLDocument();
 
@@ -15,7 +8,7 @@
         var html = [];
 
         for (var i = 0, l = nodes.length; i < l; i++) {
-            if (nodes[i].tagName !== 'SCRIPT' && nodes[i].tagName !== 'STYLE') {
+            if ( nodes[i].tagName !== 'SCRIPT' && nodes[i].tagName !== 'STYLE' ) {
                 html.push(nodes[i]);
             }
         }
@@ -32,175 +25,21 @@
 
         var email = formzu_ajax_obj.email;
 
-        $('#open-formzu-page-button').bind('click', function() {
-            var url = 'https://ws.formzu.net/new_form.php?dmail=' + email + '&wp-plugin';
-            window.open(url);
-        });
+        // Fixed on 2020.08.21
+        // - open-formzu-page-buttonの処理を削除
+        // Fixed on 2026.08.27
+        // - emailがURLエンコードされるよう修正
 
         $('#goto-formzu-page-button').bind('click', function() {
-            var url = 'https://ws.formzu.net/new_form.php?dmail=' + email + '&wp-plugin';
-            //openIframeWindow(url);
-            window.open(url);
+            var url = 'https://www.formzu.com/new_form?email=' + encodeURIComponent(email) + '&wp-plugin';
+            window.open(url, '_blank', 'noopener,noreferrer');
         });
 
         $('.formzu-login-button').bind('click', function() {
             var url = $(this).attr('data-url');
             var reload_form_id = $(this).attr('data-form-id');
-            //openIframeWindow(url, reload_form_id);
-            window.open(url, reload_form_id);
+            window.open(url, reload_form_id, 'noopener,noreferrer');
         });
-
-
-        /*
-         * Fixed at 2020.11.02
-         *   - v1.5における変更に伴い未使用になっていた関数をコメントアウト
-        */
-        /*
-        function openIframeWindow(url, reload_form_id) {
-            if (!url) {
-                return false;
-            }
-
-            reload_form_id = getFormIdFromString(reload_form_id);
-
-            if (!reload_form_id) {
-                reload_form_id = null;
-            }
-
-            var window_width = $(window).width();
-            var window_height = $(window).height();
-
-            if ($('#formzu-iframe-container').length) {
-
-                var $container = $('#formzu-iframe-container');
-
-                if ($container.attr('data-url') != url) {
-                    $container.remove();
-                } else if ($container.hasClass('hide')) {
-                    $container.removeClass('hide').animate({
-                        'left': '0'
-                    }, 'slow', 'swing', function() {
-                        $container.css({ 'left': '0' });
-                        $('html,body').animate({ 'scrollTop': '0' });
-                    });
-                    return false;
-                } else {
-                    $container.animate({
-                        'left': '+=' + window_width
-                    }, 'slow').addClass('hide');
-                    return false;
-                }
-            }
-
-            var $wpcontent_width = $('#wpcontent').width();
-
-            var $container = $('<div id="formzu-iframe-container">').css({
-                'background-color': 'white',
-                'width': $wpcontent_width,
-                'height': window_height,
-                'position': 'absolute',
-                'top': '0',
-                'left': window_width,
-                'border': 'solid 1px #777'
-            });
-            $container.attr('data-url', url);
-
-            $container.animate({
-                'left': '0'
-            }, 'slow', 'swing', function() {
-                $container.css({ 'left': '0' });
-                $('html,body').animate({ 'scrollTop': '0' });
-            });
-
-            $(window).resize(function() {
-                if ($container.hasClass('hide')) {
-
-                    var window_width = $(window).width();
-
-                    $container.css({ 'left': window_width });
-                }
-            });
-
-
-            var $close_button = $('<div><i class="fa fa-arrow-right" aria-hidden="true"></i>元の画面へ戻る</div>');
-
-            $close_button.css({
-                'color': '#999',
-                'border-bottom': '1px solid #999',
-                'font-size': '1.8em',
-                'font-family': '"Meiryo","MS PGothic", Arial, "ヒラギノ角ゴ Pro W3", sans-serif',
-                'font-weight': 'bold',
-                'padding': '4px 16px',
-                'cursor': 'pointer',
-                'padding': '16px 14px',
-                'left': window_width
-            }).hover(function() {
-                $(this).css({
-                    'color': '#555'
-                });
-            }, function() {
-                $(this).css({
-                    'color': '#999'
-                });
-            });
-
-            $close_button.bind('click', function() {
-                var window_width = $(window).width();
-                $container.animate({
-                    'left': '+=' + window_width
-                }, 'slow', 'swing', function() {
-                    $container.addClass('hide');
-                    if (reload_form_id) {
-                        alert('フォーム情報を更新します。');
-                        getHTMLForReload(null, reload_form_id);
-                    }
-                });
-            });
-
-            $container.append($close_button);
-
-
-            var $iframe = $('<iframe src="' + url + '"></iframe>');
-
-            $iframe.css({
-                'height': '90%',
-                'width': 'inherit'
-            });
-
-            function flashBackButton(cb) {
-                var options = {};
-
-                if (cb) {
-                    options.complete = cb;
-                }
-                $close_button.animate({
-                    'color': 'white'
-                }).animate({
-                    'color': '#555'
-                }, options);
-            }
-
-            var load_counter = 0;
-
-            $iframe.load(function() {
-                load_counter++;
-                if (load_counter > 5) {
-                    flashBackButton();
-                }
-            }).trigger('load');
-            $container.append($iframe);
-
-            var $clear = $('<div class="clear"></div>');
-
-            $container.append($clear);
-            $('#wpbody-content').append($container);
-
-            if (reload_form_id && !sessionStorage.getItem('hide_reload_alert')) {
-                alert('フォーム保存後、画面上部の「元の画面へ戻る」ボタンを押すと自動的に「更新」できます。\n元の画面へ戻った後、更新が終了するまでお待ちください。');
-                sessionStorage.setItem('hide_reload_alert', 1);
-            }
-        }
-        */
 
         function submitFormData(form_elem_id, data) {
             console.log('submitFormData start');
@@ -213,57 +52,86 @@
             var mobile_ibody_id = 'mobile_ibody';
             var submitted = false;
 
-            /*
-             * Fixed at 2020.12.08
-             *   - height算出用iframeのデフォルト幅を変更
-             */
-            create_iframe_to_get_data(ibody_id, html, '600px'); //'100%');
+            // Fixed on 2020.12.08
+            // - height算出用iframeのデフォルト幅を変更
+            create_iframe_to_get_data(ibody_id, html, '600px');
             create_iframe_to_get_data(mobile_ibody_id, mobile_html, '320px'); //for iPhone 5
 
             setTimeout(function() {
-                if (submitted) {
+                if ( submitted ) {
                     return true;
                 }
                 var result = execute_submit('force_submit');
-                if (!result) {
+                if ( ! result ) {
                     alert('更新に失敗しました。ブラウザをリロードして更新し直してください。');
                     return false;
                 }
                 return true;
             }, 4000);
 
-            /*
-             * Fixed at 2020.12.08
-             *   - iframeへのhtml追加方法を変更
-             *   - headタグ内に入るべき要素がbodyタグ内に入っていた問題を修正
-             *   - SSLスマートシールのdivタグで正しいheightが取得出来ていなかった問題を修正
-             *   - 画像URLの修正条件を変更
-             */
+            // Fixed on 2020.12.08
+            // - iframeへのhtml追加方法を変更
+            // - headタグ内に入るべき要素がbodyタグ内に入っていた問題を修正
+            // - SSLスマートシールのdivタグで正しいheightが取得出来ていなかった問題を修正
+            // - 画像URLの修正条件を変更
+            // Fixed on 2026.08.07
+            // - iframe生成時のスクリプト実行を禁止
+            // - script, iframe, object, embed, base, meta[http-equiv]要素を除去
+            // - イベント属性,危険性の高いURLを除去
+            // Fixed on 2026.08.10
+            // - attributesがundefinedの場合にエラーが発生してフォームの高さが取得できない問題を修正
+            // Fixed on 2026.08.27
+            // - iframeの検証を追加
             function create_iframe_to_get_data(id, html, width) {
                 console.log('create_iframe_to_get_data start');
-                $('<iframe></iframe>').attr('id', id).css('width', width).css('overflow-y', 'visible').load(function() {
-                    /*
-                    var $ibody = $(this.contentWindow.document.body);
-
-                    on_submit_count++;
-                    $ibody.append(html);
-
-                    $ibody = render_cross_domain_elem($ibody);
-                    */
+                // $('<iframe></iframe>').attr('id', id).css('width', width).css('overflow-y', 'visible').load(function() {
+                $('<iframe></iframe>').attr({'id': id, 'sandbox': 'allow-same-origin'}).css('width', width).css('overflow-y', 'visible').load(function() {
+                    // var $ibody = $(this.contentWindow.document.body);
+                    // on_submit_count++;
+                    // $ibody.append(html);
+                    // $ibody = render_cross_domain_elem($ibody);
 
                     $(html).map(function(_, elem) {
-                        if ($(elem).is("meta") || $(elem).is("style") || $(elem).is("link") || $(elem).is("title")) {
+                        if ( $(elem).is('script, iframe, object, embed, base, meta[http-equiv]') ) {
+                            return;
+                        }
+                        $(elem).find('script, iframe, object, embed, base, meta[http-equiv]').remove();
+                        $(elem).find('*').addBack().each(function() {
+                            if ( this.nodeType !== 1 || ! this.attributes ) {
+                                return;
+                            }
+
+                            var attributes = this.attributes;
+                            for (var i = attributes.length - 1; i >= 0; i--) {
+                                var name = attributes[i].name;
+                                var value = attributes[i].value;
+
+                                if ( /^on/i.test(name) ) {
+                                    this.removeAttribute(name);
+                                    continue;
+                                }
+
+                                if (
+                                    /^(href|src|xlink:href)$/i.test(name)
+                                    && /^\s*(javascript|vbscript):/i.test(value)
+                                ) {
+                                    this.removeAttribute(name);
+                                }
+                            }
+                        });
+
+                        if ( $(elem).is("meta") || $(elem).is("style") || $(elem).is("link") || $(elem).is("title") ) {
                             document.getElementById(id).contentDocument.getElementsByTagName("head")[0].appendChild(elem);
                         }
                         else {
                             $(elem).find("img").each(function() {
                                 var src = $(this).attr("src");
 
-                                if (typeof src == 'undefined' || src == null) {
+                                if ( typeof src === 'undefined' || src === null ) {
                                     return;
                                 }
 
-                                if (src[0] == '/' && ((src.indexOf('/userfiles') != -1) || (src.indexOf('/image') != -1))) {
+                                if ( src[0] === '/' && ((src.indexOf('/userfiles') !== -1) || (src.indexOf('/image') !== -1)) ) {
                                     $(this).attr('src', 'https://ws.formzu.net' + src).each(function(){
                                         $(this).load();
                                     });
@@ -273,15 +141,25 @@
                         }
                     });
 
-                    var geotrust_img = document.createElement("img");
-                    geotrust_img.style.cssText = "height: 62px";
-                    var geotrust_elem = document.getElementById(id).contentDocument.getElementsByTagName("form")[0].nextElementSibling;
-
-                    if (typeof geotrust_elem == "undefined" || geotrust_elem == null) {
+                    var iframe_document = this.contentDocument;
+                    if ( ! iframe_document ) {
                         return;
                     }
 
-                    if (geotrust_elem.tagName == "DIV" && geotrust_elem.id != "advertising-bottom") {
+                    var form_elements = iframe_document.getElementsByTagName("form");
+                    if ( form_elements.length === 0 ) {
+                        return;
+                    }
+
+                    var geotrust_img = document.createElement("img");
+                    geotrust_img.style.cssText = "height: 62px";
+
+                    var geotrust_elem = form_elements[0].nextElementSibling;
+                    if ( ! geotrust_elem || typeof geotrust_elem === "undefined" || geotrust_elem === null ) {
+                        return;
+                    }
+
+                    if ( geotrust_elem.tagName === "DIV" && geotrust_elem.id !== "advertising-bottom" ) {
                         var a = document.createElement("a");
                         geotrust_elem.appendChild(a).appendChild(geotrust_img);
                     }
@@ -290,35 +168,32 @@
                 console.log('create_iframe_to_get_data end');
             }
 
-            /*
-             *  Fixed at 2020.10.26
-             *    - $geo_trust_elemが指す要素が複雑になっていたのを修正
-             */
+            // Fixed on 2020.10.26
+            // - $geo_trust_elemが指す要素が複雑になっていたのを修正
             function render_cross_domain_elem($ibody) {
                 console.log('render_cross_domain_elem start');
                 var $google_translate_elem = $ibody.find('#google_translate_element').css('height', '24px'); //mobile : .css('width', '100%')
                 var $geo_trust_img = $('<img />').css('height', '55px');
-                //var $geo_trust_elem = $ibody.children().last().children().last();
                 var $geo_trust_elem = $ibody.find('form').next();
 
-                if ($geo_trust_elem.prop('tagName') === 'DIV') {
+                if ( $geo_trust_elem.prop('tagName') === 'DIV' ) {
                     $geo_trust_elem.append($('<a></a>').append($geo_trust_img));
                 }
                 $ibody.find('img').each(function() {
                     var src = $(this).attr('src');
 
-                    // Added at 2020.10.21
-                    if (typeof src == 'undefined') {
+                    // Added on 2020.10.21
+                    if ( typeof src === 'undefined' ) {
                         return;
                     }
 
-                    if (src[0] == '/' && src.indexOf('/userfiles') != -1) {
+                    if ( src[0] === '/' && src.indexOf('/userfiles') !== -1 ) {
                         $(this).attr('src', 'https://ws.formzu.net' + src);
                         on_load_count++;
                         $(this).one('load', function() {
                             submitted = complete_loading_image();
                         }).each(function() {
-                            if (this.complete) {
+                            if ( this.complete ) {
                                 $(this).load();
                             }
                         });
@@ -331,22 +206,20 @@
             function complete_loading_image() {
                 console.log('complete_loading_image start');
                 on_load_count--;
-                if (on_load_count != 0) {
+                if ( on_load_count !== 0 ) {
                     return false;
                 }
                 console.log('complete_loading_image end');
                 return execute_submit();
             }
 
-            /*
-             * Fixed at 2020.11.17 - 2020.12.08
-             *   - コードの見直し
-             */
+            // Fixed on 2020.11.17 - 2020.12.08
+            // - コードの見直し
             function execute_submit(force_submit) {
                 console.log('execute_submit start');
                 on_submit_count--;
-                if (on_submit_count != 0) {
-                    if (!force_submit) {
+                if ( on_submit_count !== 0 ) {
+                    if ( ! force_submit ) {
                         return false;
                     }
                 }
@@ -354,89 +227,56 @@
                 var iframe = document.getElementById(ibody_id);
                 var mobile_iframe = document.getElementById(mobile_ibody_id);
 
-                if (!iframe || !mobile_iframe) {
+                if ( ! iframe || ! mobile_iframe ) {
                     return false;
                 }
-
-                /*
-                var $iframe = $(iframe);
-                var $mobile_iframe = $(mobile_iframe);
-                $iframe.show();
-                $mobile_iframe.show();
-                */
 
                 $(iframe).show();
                 $(mobile_iframe).show();
 
-                /*
-                var ibody = iframe.contentWindow.document.body;
-                var mobile_ibody = mobile_iframe.contentWindow.document.body;
-                var $ibody = $(ibody);
-                var $mobile_ibody = $(mobile_ibody);
-                var textarea_length = $ibody.find('textarea').length;
-                */
                 var form = document.forms[form_elem_id];
-                
 
-                /*
-                 * Fixed at 2020.10.20 - 2020.10.27
-                 *   - IE11への対応
-                 *   - 余白算出方法の修正
-                 * Fixed at 2020.11.10 - 2020.12.08
-                 *   - height算出方法の修正
-                 *   - ブラウザ別,element別のheight補正
-                 */
-
-                /*
-                var height = $ibody.parent().outerHeight() + 40 + (40 * textarea_length);
-                var mobile_height = $mobile_ibody.parent().outerHeight() + 40 + (40 * textarea_length) + 85; //body:padding-top
-                var height = $(iframe.contentDocument.body).outerHeight(true) + 50;
-                var mobile_height = $(mobile_iframe.contentDocument.body).outerHeight(true) + 50;
-                */
+                // Fixed on 2020.10.20 - 2020.10.27
+                // - IE11への対応
+                // - 余白算出方法の修正
+                // Fixed on 2020.11.10 - 2020.12.08
+                // - height算出方法の修正
+                // - ブラウザ別,element別のheight補正
 
                 var height = $(iframe.contentDocument).outerHeight(true);
                 var mobile_height = $(mobile_iframe.contentDocument).outerHeight(true);
 
                 var userAgent = window.navigator.userAgent.toLowerCase();
 
-                if (userAgent.indexOf("chrome") != -1) {
+                if ( userAgent.indexOf("chrome") !== -1 ) {
                     height = height + 10;
                 }
-                else if (userAgent.indexOf("firefox") != -1) {
+                else if ( userAgent.indexOf("firefox") !== -1 ) {
                     height = height + 10;
                 }
-                else if (userAgent.indexOf("trident") != -1) {
+                else if ( userAgent.indexOf("trident") !== -1 ) {
                     height = height + 50;
                 }
 
                 $(iframe.contentDocument).find("textarea").each(function() {
-                    if (userAgent.indexOf("chrome") != -1) {
+                    if ( userAgent.indexOf("chrome") !== -1 ) {
                         height = height + 17;
                     }
-                    else if (userAgent.indexOf("firefox") != -1) {
+                    else if ( userAgent.indexOf("firefox") !== -1 ) {
                         height = height + 13;
                     }
-                    else if (userAgent.indexOf("trident") != -1) {
+                    else if ( userAgent.indexOf("trident") !== -1 ) {
                         height = height + 10;
                     }
                 });
 
-                /*
-                 * Fixed at 2020.11.18 - 2020.12.08
-                 *   - 「必須」の表示を強調
-                 *   - 項目ごとに改行を挿入
-                 */
-
-                /*
-                var title = $ibody.find('title').text();
-                var items = $ibody.find('.itemTitle').map(function(index, elem) {
-                    return $(elem).text();
-                }).get().join();
-                */
+                // Fixed on 2020.11.18 - 2020.12.08
+                // - 「必須」の表示を強調
+                // - 項目ごとに改行を挿入
 
                 var title = $(iframe.contentDocument).find('title').text();
                 var items = $(iframe.contentDocument.body).find('.itemTitle').map(function(index, elem) {
-                    if ($(elem).find('.req-mark').size()) {
+                    if ( $(elem).find('.req-mark').size() ) {
                         var req_text = $(elem).find('.req-mark').first().text();
                         $(elem).find('.req-mark').remove();
                         return $(elem).text() + '[' + req_text + ']';
@@ -462,10 +302,8 @@
             console.log('submitFormData end');
         }
 
-        /*
-         * Fixed at 2020.11.17
-         *   - コードの見直し
-         */
+        // Fixed on 2020.11.17
+        // - コードの見直し
         function submitDefaultData(form_elem_id, form_id) {
             console.log('submitDefaultData start');
             var form = document.forms[form_elem_id];
@@ -480,22 +318,21 @@
             return true;
         }
 
-        /*
-         * Fixed at 2020.10.26
-         * - console.logがunreachableになっていたのを修正
-         * 
-         * Fixed on 2022.04.11
-         * - フォームID桁数が増えた場合への対応
-         * - コードの見直し
-         */
+        // Fixed on 2020.10.26
+        // - console.logがunreachableになっていたのを修正
+        // Fixed on 2022.04.11
+        // - フォームID桁数が増えた場合への対応
+        // - コードの見直し
+        // Fixed on 2026.08.18
+        // - コードの見直し
         function getFormIdFromString(form_id) {
             console.log('getFormIdFromString start');
 
-            if (!form_id) {
+            if ( ! form_id ) {
                 return false;
             }
 
-            if (form_id.match(/[Ｓｓ０-９]/g)) {
+            if ( form_id.match(/[Ｓｓ０-９]/g) ) {
                 form_id = form_id.replace(/[Ｓｓ０-９]/g, function(s) {
                     return String.fromCharCode(s.charCodeAt(0) - 0xFEE0);
                 });
@@ -503,68 +340,11 @@
 
             form_id = form_id.trim();
 
-            if (form_id.match(/S[0-9]{5,}/)) {
-                form_id = form_id.match(/S[0-9]{5,}/)[0];
-                var matchLen = form_id.length;
-
-                for (var i = 1; i < matchLen; i++) {
-                    if (isNaN(form_id[i])) {
-                        return form_id.substr(0, i);
-                    }
-                }
-
+            var matched_form_id = form_id.match(/S[0-9]{5,9}(?![0-9])/);
+            if ( matched_form_id ) {
+                form_id = matched_form_id[0];
                 return form_id;
             }
-
-            /*
-            var temp = form_id;
-            temp = temp.substr(0, 5);
-
-            if (temp.length >= 5 && !temp.match(/[^0-9]+/)) {
-                matchlen = temp.match(/[^0-9]+/)[0].length;
-                for (var i = 5, l = matchlen; i < l; i++) {
-                    if (isNaN(form_id[i])) {
-                        return 'S' + form_id.substr(0, i);
-                    }
-                }
-                return 'S' + form_id;
-            }
-            
-            function indexOfAfterKeywords(keywords) {
-                console.log('indexOfAfterKeywords start');
-                var inOf;
-
-                for (var i = 0, l = keywords.length; i < l; i++) {
-                    inOf = form_id.indexOf(keywords[i]);
-                    if (inOf != -1) {
-                        break;
-                    }
-                }
-                if (inOf != -1) {
-
-                    var result = inOf + keywords[i].length;
-
-                    if (result > 0) {
-                        return result;
-                    }
-                }
-                console.log('indexOfAfterKeywords end');
-                return false;
-            }
-
-            var keywords = ['gen/S', 'en/S', 'n/S', '/S', 'S'];
-            var inOf_key = indexOfAfterKeywords(keywords);
-
-            if (inOf_key) {
-                var temp;
-                for (var i = 8, l = 5; i >= l; i--) {
-                    temp = form_id.substr(inOf_key, i);
-                    if (temp.length == i && !temp.match(/[^0-9]+/)) {
-                        return 'S' + temp;
-                    }
-                }
-            }
-            */
 
             console.log('getFormIdFromString end');
             return false;
@@ -575,27 +355,27 @@
 
         function getHTMLForReload(e, reload_form_id) {
             console.log('getHTMLForReload start');
-            if (e) {
+            if ( e ) {
                 e.preventDefault();
             }
             var form_id;
             var from_str;
 
-            if (typeof reload_form_id == 'string') {
+            if ( typeof reload_form_id === 'string' ) {
                 form_id = reload_form_id;
             } else {
                 form_id = $(this).attr('data-form-id');
                 form_id = getFormIdFromString(form_id);
             }
 
-            if (!form_id) {
+            if ( ! form_id ) {
                 alert("フォームID : " + form_id + "\n無効な値が入力されました。正確な値を入力してください。");
                 return false;
             }
 
             var $this = $(this);
 
-            if ($this.prop('tagName')) {
+            if ( $this.prop('tagName') ) {
                 $this.unbind('click');
                 $this.after('<p class="form-info-loading"><i class="fa fa-refresh fa-spin" aria-hidden="true"></i>フォーム情報取得中...</p>');
             } else {
@@ -607,31 +387,29 @@
             return;
         }
 
-
-        $add_new_form = $('#add-new-form-data');
+        var $add_new_form = $('#add-new-form-data');
 
         function getFormHTMLForAdd(e) {
             console.log('getFormHTMLForAdd start');
-            if (e) {
+            if ( e ) {
                 e.preventDefault();
             }
             var form = document.forms['add-new-form-data'];
 
-            if (!form) {
+            if ( ! form ) {
                 alert("フォームの入力値が取得できませんでした。");
                 return false;
             }
 
-            var form_id = form.elements['form_id_URL'].value;
-
-            if (!form.elements['form_id_URL']) {
+            if ( ! form.elements['form_id_URL'] ) {
                 alert("フォームIDが入力されていません。");
                 return false;
             }
 
+            var form_id = form.elements['form_id_URL'].value;
             form_id = getFormIdFromString(form_id);
 
-            if (!form_id) {
+            if ( ! form_id ) {
                 alert("フォームID : " + form_id + "\n無効な値が入力されました。正確な値を入力してください。");
                 return false;
             }
@@ -655,29 +433,83 @@
         function getHTMLByAjax(form_elem_id, form_id) {
             console.log('getHTMLByAjax start');
 
+            // Fixed on 2026.08.27
+            // - 外部フォーム取得失敗時のフォールバック処理を補助関数として切り出し
+            function fallbackToDefaultData() {
+                alert('フォームの高さの自動設定に失敗しました。(4)\nフォームの高さは手動で調整する必要があります。\n詳しくは「使い方」メニューの「エラー・トラブル」項目をご覧ください');
+                removeLoadingElements(form_elem_id);
+                submitDefaultData(form_elem_id, form_id);
+                return false;
+            }
+
+            // Fixed on 2026.08.27
+            // - Ajaxレスポンスの検証を追加
             function parseAjaxResponse(response, dataType) {
                 console.log('parseAjaxResponse start');
-                if (!$.parseHTML || typeof $.parseHTML !== 'function') {
+
+                if (
+                    ! (response instanceof Array)
+                    || ! Array.isArray(response)
+                    || response.length < 2
+                    || typeof response[0] !== 'string'
+                    || typeof response[1] !== 'string'
+                    || response[0].trim() === ''
+                    || response[1].trim() === ''
+                ) {
+                    return fallbackToDefaultData();
+                }
+
+                var html;
+                var mobile_html;
+
+                if ( ! $.parseHTML || typeof $.parseHTML !== 'function' ) {
                     var html = parseHTML(response[0]);
                     var mobile_html = parseHTML(response[1]);
                 } else {
                     var html = $.parseHTML(response[0]);
                     var mobile_html = $.parseHTML(response[1]);
                 }
-                if (response[3]) {
+
+                var $html = $(html);
+                var $mobile_html = $(mobile_html);
+                var html_has_form = (
+                    $html.is('form')
+                    || $html.find('form').length > 0
+                );
+                var mobile_html_has_form = (
+                    $mobile_html.is('form')
+                    || $mobile_html.find('form').length > 0
+                );
+
+                if ( ! html_has_form || ! mobile_html_has_form ) {
+                    return fallbackToDefaultData();
+                }
+
+                if (
+                    (response[2] instanceof Array)
+                    && response[2].length > 0
+                ) {
+                    console.log(response[2])
+                }
+
+                /*
+                if ( response[3] ) {
                     console.log(response[3]);
                 }
-                if (!html || !mobile_html) {
+                if ( ! html || ! mobile_html ) {
                     alert('フォームの高さの自動設定に失敗しました。(1)\nフォームの高さは手動で調整する必要があります。\n詳しくは「使い方」メニューの「エラー・トラブル」項目をご覧ください');
                     removeLoadingElements(form_elem_id);
                     submitDefaultData(form_elem_id, form_id);
                     return false;
                 }
+                */
+
                 submitFormData(form_elem_id, {
                     "form_id": form_id,
                     "html": html,
                     "mobile_html": mobile_html
                 });
+
                 console.log('parseAjaxResponse end');
             }
 
@@ -688,14 +520,14 @@
                 console.log(textStatus);
                 console.log(error);
 
-                if (XMLHttpRequest.status != 200) {
+                if ( XMLHttpRequest.status !== 200 ) {
                     alert('フォームの高さの自動設定に失敗しました。(2)\nフォームの高さは手動で調整する必要があります。\n詳しくは「使い方」メニューの「エラー・トラブル」項目をご覧ください');
                     removeLoadingElements(form_elem_id);
                     submitDefaultData(form_elem_id, form_id);
                     return false;
                 }
 
-                if (!XMLHttpRequest.responseText) {
+                if ( ! XMLHttpRequest.responseText ) {
                     alert('フォームの高さの自動設定に失敗しました。(3)\nフォームの高さは手動で調整する必要があります。\n詳しくは「使い方」メニューの「エラー・トラブル」項目をご覧ください');
                     removeLoadingElements(form_elem_id);
                     submitDefaultData(form_elem_id, form_id);
@@ -706,7 +538,7 @@
                 var open_index = text.indexOf('[');
                 var close_index = text.lastIndexOf(']');
 
-                if (open_index == -1 || close_index == -1) {
+                if ( open_index === -1 || close_index === -1 ) {
                     alert('フォームの高さの自動設定に失敗しました。(4)\nフォームの高さは手動で調整する必要があります。\n詳しくは「使い方」メニューの「エラー・トラブル」項目をご覧ください');
                     removeLoadingElements(form_elem_id);
                     submitDefaultData(form_elem_id, form_id);
@@ -723,7 +555,7 @@
                     console.log('retry is also failed');
                 }
 
-                if (!(json_value instanceof Array) || !(Array.isArray(json_value))) {
+                if ( ! (json_value instanceof Array) || ! (Array.isArray(json_value)) ) {
                     alert('フォームの高さの自動設定に失敗しました。(5)\nフォームの高さは手動で調整する必要があります。\n詳しくは「使い方」メニューの「エラー・トラブル」項目をご覧ください');
                     removeLoadingElements(form_elem_id);
                     submitDefaultData(form_elem_id, form_id);
@@ -735,7 +567,7 @@
 
             function removeLoadingElements(form_elem_id) {
                 console.log('removeLoadingElements start');
-                if (form_elem_id == 'add-new-form-data') {
+                if ( form_elem_id === 'add-new-form-data' ) {
                     $('.fa-refresh').parent().remove();
                     $('#add-new-form-submit').bind('click', getFormHTMLForAdd);
 
@@ -744,7 +576,7 @@
                     $input.unbind('keypress');
                     $input.keypress(getNewFormIdFromEnterKey);
 
-                } else if (form_elem_id == 'reload-form-data') {
+                } else if ( form_elem_id === 'reload-form-data' ) {
                     $('.fa-refresh').parent().remove();
                     $('.formzu-reload-button').bind('click', getHTMLForReload);
                 }
@@ -771,7 +603,7 @@
 
 
         function getNewFormIdFromEnterKey(e) {
-            if (e.keyCode == 13) {
+            if ( e.keyCode === 13 ) {
                 e.preventDefault();
                 getFormHTMLForAdd(e);
             }

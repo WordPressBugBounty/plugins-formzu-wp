@@ -1,8 +1,8 @@
 <?php
-
 if ( ! defined('FORMZU_PLUGIN_PATH') ) {
     die();
 }
+
 
 function echo_formzu_admin_page() {
     $screen = get_current_screen();
@@ -11,9 +11,9 @@ function echo_formzu_admin_page() {
     ?>
         <div class="wrap">
             <h2>フォーム管理（フォームズ）</h2>
-            <i class="fa fa-external-link-square"></i><a style="margin-right: 12px;" href="https://www.formzu.com" target="_blank">フォームズトップページ</a>
-            <i class="fa fa-frown-o"></i><a style="margin-right: 12px;" href="#" onClick="javascript:window.open('https://ws.formzu.net/dist/S95904411/', 'mailform1', 'toolbar=no, location=no, status=yes, menubar=yes, resizable=yes, scrollber=yes, width=600, height=550, top=50, left=50')">改善要望</a>
-            <i class="fa fa-exclamation-triangle"></i><a style="margin-right: 12px;" href="#" onClick="javascript:window.open('https://ws.formzu.net/dist/S97257136/', 'mailform1', 'toolbar=no, location=no, status=yes, menubar=yes, resizable=yes, scrollber=yes, width=600, height=550, top=50, left=50')">不具合報告</a>
+            <i class="fa fa-external-link-square"></i><a style="margin-right: 12px;" href="https://www.formzu.com" target="_blank" rel="noopener noreferrer">フォームズトップページ</a>
+            <i class="fa fa-frown-o"></i><a style="margin-right: 12px;" href="#" onClick="javascript:window.open('https://ws.formzu.net/dist/S95904411/', 'mailform1', 'noopener, noreferrer, toolbar=no, location=no, status=yes, menubar=yes, resizable=yes, scrollber=yes, width=600, height=550, top=50, left=50')">改善要望</a>
+            <i class="fa fa-exclamation-triangle"></i><a style="margin-right: 12px;" href="#" onClick="javascript:window.open('https://ws.formzu.net/dist/S97257136/', 'mailform1', 'noopener, noreferrer, toolbar=no, location=no, status=yes, menubar=yes, resizable=yes, scrollber=yes, width=600, height=550, top=50, left=50')">不具合報告</a>
 
             <div id="poststuff" class="metabox-holder">
                 <div class="postbox-conteiner formzu-container">
@@ -30,15 +30,14 @@ function echo_formzu_admin_page() {
                 </div>
             </div>
 
-
             <script type="text/javascript">
                 (function($){
                     $(document).ready(function($){
                         $('.if-js-closed').removeClass('if-js-closed').addClass('closed');
 
                         <?php
-                        // Fixed at 2020.10.21
-                        //   - Wordpress5.5への対応(metaboxの仕様変更に伴うもの)
+                        // Fixed on 2020.10.21
+                        // - Wordpress5.5への対応(metaboxの仕様変更に伴うもの)
                         global $wp_version;
                         if ( version_compare( $wp_version, '5.5', '>=' ) ) {
                         ?>
@@ -119,8 +118,6 @@ function echo_formzu_admin_page() {
                     });
                 })(jQuery);
             </script>
-
-
         </div>
     <?php
 }
@@ -130,25 +127,15 @@ function echo_create_formzu_form_body() {
 ?>
     <div class="panel">
         <div class="panel-content">
-
             <div id="goto-formzu-page-button" class="large-button">フォームズを表示する</div>
-            <!--
-            <div id="open-formzu-page-button" class="large-button">別タブでフォームズを表示する</div>
-            -->
-            <!--
-            <div id="open-formzu-page-button" class="large-button" style="margin: 0 0 20px 0;">別タブでフォームズを表示する</div>
-            <div id="goto-formzu-page-button" class="large-button">同じ画面でフォームズを表示する</div>
-            -->
-
         </div>
     </div>
 <?php
 }
 
-/*
- * Fixed at 2020.11.18
- *   - add-new-form-dataのinput要素の並び順を変更
- */
+
+// Fixed on 2020.11.18
+// - add-new-form-dataのinput要素の並び順を変更
 function echo_add_formzu_form_body() {
 ?>
     <div class="panel">
@@ -158,7 +145,7 @@ function echo_add_formzu_form_body() {
             <!-- postbox-wrap-formにadd-new-form-data formが内包されてしまっているせいで消されてしまう。別の箇所にhiddenで設置するべき？-->
 
             <form id="add-new-form-data" method="post" action="">
-                <?php wp_nonce_field( 'formzu-new-form-save', 'add-new-form' ); ?>
+                <?php wp_nonce_field('formzu-new-form-save', 'add-new-form'); ?>
                 <div id="add-new-form-container">
                     <label for="add-new-form-input" id="add-new-form-label">フォームID</label>
                     <input type="text" id="add-new-form-input" name="form_id_URL" placeholder="例）S12345678">
@@ -180,15 +167,20 @@ function echo_add_formzu_form_body() {
 <?php
 }
 
-/*
- * Fixed at 2020.11.18
- *   - reload-form-dataのinput要素の並び順を変更
- */
+
+// Fixed on 2020.11.18
+// - reload-form-dataのinput要素の並び順を変更
+// Fixed on 2026.08.18
+// - クエリパラメータの文字列チェックを追加
 function echo_formzu_list_body() {
-    $form_data = FormzuOptionHandler::get_option( 'form_data' );
+    if ( ! isset($_REQUEST['s']) || ! is_string($_REQUEST['s']) ) {
+        unset($_REQUEST['s']);
+    }
+
+    $form_data = FormzuOptionHandler::get_option('form_data');
     $list_table = new FormzuListTable();
 
-    if (isset($_POST['s'] )){
+    if ( isset($_POST['s']) ) {
         $list_table->prepare_items($_POST['s']);
     }
     else {
@@ -196,22 +188,24 @@ function echo_formzu_list_body() {
     }
 
 ?>
-    <?php if ( ! empty( $_REQUEST['s'] ) ) {
-        echo sprintf( '<span class="subtitle"> ' . __( '検索結果：', 'formzu-admin' ) . '%s </span>', esc_html( $_REQUEST['s'] ) );
+    <?php if ( isset($_REQUEST['s']) && is_string($_REQUEST['s']) ) {
+        echo sprintf('<span class="subtitle"> %s%s </span>',
+            __('検索結果：', 'formzu-admin'),
+            esc_html($_REQUEST['s'])
+        );
     }?>
     <form id="forms-filter" method="get">
-        <input type="hidden" name="page" value="<?php echo esc_html( wp_strip_all_tags( $_REQUEST['page'] ) ); ?>" />
-        <?php $list_table->search_box( __( '検索', 'formzu-admin' ), 'formzu_search'); ?>
+        <input type="hidden" name="page" value="<?php echo esc_html(wp_strip_all_tags($_REQUEST['page'])); ?>" />
+        <?php $list_table->search_box(__('検索', 'formzu-admin'), 'formzu_search'); ?>
         <?php $list_table->display(); ?>
     </form>
-        <form id="reload-form-data" method="post" action="">
-            <?php wp_nonce_field( 'formzu-reload-form-save', 'reload-form-data' ); ?>
-            <input type="hidden" name="hidden_id" value="" />
-            <input type="hidden" name="hidden_title" value="" />
-            <input type="hidden" name="hidden_items" value="" />
-            <input type="hidden" name="hidden_height" value="" />
-            <input type="hidden" name="hidden_mobile_height" value="" />
-        </form>
+    <form id="reload-form-data" method="post" action="">
+        <?php wp_nonce_field('formzu-reload-form-save', 'reload-form-data'); ?>
+        <input type="hidden" name="hidden_id" value="" />
+        <input type="hidden" name="hidden_title" value="" />
+        <input type="hidden" name="hidden_items" value="" />
+        <input type="hidden" name="hidden_height" value="" />
+        <input type="hidden" name="hidden_mobile_height" value="" />
+    </form>
 <?php
 }
-

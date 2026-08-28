@@ -1,8 +1,8 @@
 <?php
-
 if ( ! defined('FORMZU_PLUGIN_PATH') ) {
     die();
 }
+
 
 function formzu_howtouse_enqueue_script() {
     wp_enqueue_style(
@@ -13,4 +13,3 @@ function formzu_howtouse_enqueue_script() {
         'all'
     );
 }
-

@@ -1,8 +1,8 @@
 <?php
-
 if ( ! defined('FORMZU_PLUGIN_PATH') ) {
     die();
 }
+
 
 function formzu_admin_enqueue_script() {
     wp_enqueue_script('jquery');
@@ -11,4 +11,3 @@ function formzu_admin_enqueue_script() {
 
     wp_enqueue_style('thickbox');
 }
-

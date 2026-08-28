@@ -1,8 +1,8 @@
 <?php
-
 if ( ! defined('FORMZU_PLUGIN_PATH') ) {
     die();
 }
+
 
 function formzu_enqueue_script() {
     wp_enqueue_style(
@@ -40,8 +40,8 @@ function formzu_enqueue_script() {
         'formzu_ajax_obj',
         array(
             'ajaxurl' => admin_url('admin-ajax.php'),
-            'nonce'   => wp_create_nonce('get_iframe_height'),
-            'action'  => 'get_iframe_height',
+            'nonce'   => wp_create_nonce('formzu_get_iframe_height'),
+            'action'  => 'formzu_get_iframe_height',
             'email'   => get_option('admin_email'),
             'version' => $wp_version,
         )
@@ -52,4 +52,3 @@ function formzu_enqueue_script() {
     <?php
 
 }
-

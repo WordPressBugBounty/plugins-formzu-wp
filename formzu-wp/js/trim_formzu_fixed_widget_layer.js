@@ -18,27 +18,27 @@
         var right = $elem.css('right');
         var left = $elem.css('left');
 
-        if (right == '0px' && left == '0px') {
+        if ( right === '0px' && left === '0px' ) {
             return false;
         }
-        if (right == '0px') {
+        if ( right === '0px' ) {
             return 'right';
         }
-        if (left == '0px'){
+        if ( left === '0px' ) {
             return 'left';
         }
         return false;
     }
 
     for (var i = 0, l = $fixed_widgets.length; i < l; i++) {
-        if (!$fixed_widgets[i]) {
+        if ( ! $fixed_widgets[i] ) {
             continue;
         }
 
         $widget = $($fixed_widgets[i]);
-        left_or_right = isRightOrLeft($widget)
+        left_or_right = isRightOrLeft($widget);
 
-        if (!left_or_right) {
+        if ( ! left_or_right ) {
             continue;
         }
 
@@ -50,32 +50,31 @@
 
         var user_agent = window.navigator.userAgent.toLowerCase();
 
-        if (user_agent.indexOf('msie') != -1) {//ie6 - ie10
+        if ( user_agent.indexOf('msie') !== -1 ) {//ie6 - ie10
             widget_width = $widget.width();
-        } else if (user_agent.indexOf('trident/7') != -1) {//ie11
+        } else if ( user_agent.indexOf('trident/7') !== -1 ) {//ie11
             widget_width = $widget.width();
         } else {
             widget_width = $widget.outerWidth(true);
         }
 
-        if (max_width[left_or_right] < widget_width) {
+        if ( max_width[left_or_right] < widget_width ) {
             max_width[left_or_right] = widget_width;
         }
     }
 
     for (var i = 0, l = $fixed_widgets.length; i < l; i++) {
-        if (!$fixed_widgets[i]) {
+        if ( ! $fixed_widgets[i] ) {
             continue;
         }
 
         $widget = $($fixed_widgets[i]);
-        left_or_right = isRightOrLeft($widget)
+        left_or_right = isRightOrLeft($widget);
 
-        if (!left_or_right) {
+        if ( ! left_or_right ) {
             continue;
         }
 
         $widget.css('width', max_width[left_or_right] + 10);
     }
 })(jQuery);
-
